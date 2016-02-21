@@ -39,7 +39,7 @@ Alternatively, you can clone the project and compile it yourself.
 Credits
 -------
 For making this project possible, I'd like to thank
-* DarthAffe for providing a .NET wrapped version of Corsair's CUE SDK
+* DarthAffe for providing a .NET wrapped version of Corsair's CUE SDK: https://github.com/DarthAffe/CUE.NET
 * Corsair for producing some sweet keyboards
 
 For inspiring me to write the original code for this project and making it possible, I'd like to thank
