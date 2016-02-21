@@ -1,9 +1,11 @@
 Snake Game
 =============
 
-A snake game for the Corsair K70 RGB keyboard for Windows, written in C# .Net.
+A snake game for the Corsair RGB keyboards for Windows, written in C# .Net.
 
-While only tested on the K70 RGB, there's a high possibility of working with others as well.
+This project should currently support the following keyboards
+* Corsair K70 RGB
+* Corsair K95 RGB
 
 This is based on the following C# project:
 https://github.com/billism1/KeyboardAudio
@@ -23,6 +25,13 @@ To start the game, turn off your Corsair Utility Engine, and launch the executab
 To stop the game, just close the window, or hit esc.
 
 If your keyboard derps out and won't take input / lights are frozen, just unplug and replug the USB cables and it should work again.
+
+Download
+--------
+
+You can find all releases under the "releases" tab on github.
+
+Alternatively, you can clone the project and compile it yourself.
 
 Notes
 -----
