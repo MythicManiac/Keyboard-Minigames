@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{3B477F21-D322-442B-B533-89864668BA27}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>KeyboardMinigames</RootNamespace>
     <AssemblyName>KeyboardMinigames</AssemblyName>
@@ -35,8 +35,13 @@
     <StartupObject>KeyboardMinigames.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CUE.NET, Version=1.0.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Dependencies\CUE.NET.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,13 +51,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Game.cs" />
-    <Compile Include="KeyboardWriter.cs" />
+    <Compile Include="SnakeGame.cs" />
+    <Compile Include="KeyboardInterface.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="SnakeGame.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
