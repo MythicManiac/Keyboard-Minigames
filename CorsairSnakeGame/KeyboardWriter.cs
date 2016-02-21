@@ -315,11 +315,17 @@ namespace KeybaordAudio
 
             if (this.keyboardUsbDevice == IntPtr.Zero)
             {
-                Console.WriteLine("Corsair K70 RGB keyboard not detected :(");
-                return 1;
+                Console.WriteLine("Corsair K70 RGB keyboard not detected...but it is ok, maybe you have a K95?");
+
+                this.keyboardUsbDevice = this.GetDeviceHandle(0x1B1C, 0x1B11, 0x3);
+                if (this.keyboardUsbDevice == IntPtr.Zero)
+                {
+                    Console.WriteLine("Nope, no K95 either...sorry you live that way.");
+                    return 1;
+                }
             }
 
-            Console.WriteLine("Corsair K70 RGB keyboard detected successfully :)");
+            Console.WriteLine("Corsair K70 or K95 RGB keyboard detected successfully :)");
 
             // Construct XY lookup table
             var keys = this.positionMap.GetEnumerator();
