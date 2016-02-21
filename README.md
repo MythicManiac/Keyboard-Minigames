@@ -1,30 +1,33 @@
 Snake Game
 =============
 
-A snake game for the Corsair RGB keyboards for Windows, written in C# .Net.
+A snake game for the Corsair keyboards for Windows, written in C# .Net.
 
-This project should currently support the following keyboards
+This project has been tested with the following keyboards:
 * Corsair K70 RGB
-* Corsair K95 RGB
 
-This is based on the following C# project:
-https://github.com/billism1/KeyboardAudio
+Other Corsair keyboards technically should work as well, however, I have not been able to test them
 
 What is it
 ----------
 
-This is a simple snake game built on top of this project: https://github.com/billism1/KeyboardAudio
+This is a simple snake game written in C# with Corsair's CUE SDK's help
 
 Basically it turns your keyboard into a snake game, see example here: https://www.youtube.com/watch?v=yYet1X18F2E&feature=youtu.be
 
 How to use
 ----------
 
-To start the game, turn off your Corsair Utility Engine, and launch the executable.
+1. Exctract the zip somewhere
+2. Open your Corsair Utility Engine
+3. Select "Assign New Action" on the button you wish to use to launch the snake game
+4. Choose "Shortcut"
+5. Choose "Run the following program"
+6. Navigate to the directory you extracted the zip, and select the "SnakeGame" file
 
-To stop the game, just close the window, or hit esc.
+Now you can start the snake game by pressing your macro key.
 
-If your keyboard derps out and won't take input / lights are frozen, just unplug and replug the USB cables and it should work again.
+To stop the game, hit esc
 
 Download
 --------
@@ -33,18 +36,12 @@ You can find all releases under the "releases" tab on github.
 
 Alternatively, you can clone the project and compile it yourself.
 
-Notes
------
-I never intended to release this at all, so the source might have some silly things lying all over the place.
-
-If you choose to clone this and use for your own purposes, you might want to clean this up a bit.
-
 Credits
 -------
-Thank you Billism1 for providing the base code of this project
+For making this project possible, I'd like to thank
+* DarthAffe for providing a .NET wrapped version of Corsair's CUE SDK
+* Corsair for producing some sweet keyboards
 
-Thank you CalcProgrammer1 for reverse engineering the USB IO for this keyboard and for providing working C++ code. See: http://www.reddit.com/r/MechanicalKeyboards/comments/2ij2um/corsair_k70_rgb_usb_protocol_reverse_engineering/ and thanks to reddit.com/u/fly-hard for the mapping of LED to positions in a matrix.
-
-Thank you Chris Lomont for providing a C# Fast Fourier transform (FFT) implementation that is easy to use. See: http://www.lomont.org/
-
-Thank you Corsair for producing a sweet keyboard.
+For inspiring me to write the original code for this project and making it possible, I'd like to thank
+* CalcProgrammer1 for reverse engineering the USB IO for this keyboard and for providing working C++ code. See: http://www.reddit.com/r/MechanicalKeyboards/comments/2ij2um/corsair_k70_rgb_usb_protocol_reverse_engineering/
+* Billism1 for providing me a good working example of interfacing with the keyboard. See: https://github.com/billism1/KeyboardAudio
