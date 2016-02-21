@@ -14,7 +14,7 @@ using System.Windows.Forms;
  * Original code ported to C# by http://www.reddit.com/user/billism
  */
 
-namespace KeybaordAudio
+namespace KeyboardMinigames
 {
     public class Game
     {

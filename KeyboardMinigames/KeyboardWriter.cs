@@ -1,16 +1,17 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <summary>
 //   Defines the KeyboardWriter type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace KeybaordAudio
+namespace KeyboardMinigames
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.InteropServices;
 
-    public class KeyboardWriter : IWriter
+    public class KeyboardWriter
     {
         #region pInvoke Imports
 
@@ -159,73 +160,28 @@ namespace KeybaordAudio
 
         #endregion
 
-        private IntPtr keyboardUsbDevice;
+        private IntPtr _keyboardUsbDevice;
 
-        private byte[] positionMap = new byte[]
-        {
-            137, 8, 20, 255,
-            0, 12, 24, 36, 48, 60, 72, 84, 96, 108, 120, 132,  6, 18, 30, 42, 32, 44, 56, 68, 255,
-            1, 13, 25, 37, 49, 61, 73, 85, 97, 109, 121, 133,  7, 31, 54, 66, 78, 80, 92,104, 116, 255,
-            2, 14, 26, 38, 50, 62, 74, 86, 98, 110, 122, 134, 90, 102, 43, 55, 67, 9, 21, 33, 128, 255,
-            3, 15, 27, 39, 51, 63, 75, 87, 99, 111, 123, 135, 126, 57, 69, 81, 128, 255,
-            4, 28, 40, 52, 64, 76, 88, 100, 112, 124, 136, 79,103, 93, 105, 117, 140, 255,
-            5, 17, 29, 53, 89, 101, 113, 91,115, 127, 139, 129, 141, 140, 255,
-        };
+        private byte[,] _ledMatrix = new byte[7, 92];
 
-        private float[] sizeMap = new[]
-        {
-            -15.5f, 1f, 1f, -2.5f, 1f, -2f, 0f,
-            1f, -.5f, 1f, 1f, 1f, 1f, -.75f, 1f, 1f, 1f, 1f, -.75f, 1f, 1f, 1f, 1f, -.5f, 1f, 1f, 1f, -.5f, 1f, 1f, 1f, 1f, 0f,
-            1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 2f, -.5f, 1f, 1f, 1f, -.5f, 1f, 1f, 1f, 1f, 0f,
-            1.5f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1.5f, -.5f, 1f, 1f, 1f, -.5f, 1f, 1f, 1f, 1f, 0f,
-            1.75f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 2.25f, -4f, 1f, 1f, 1f, 1f, 0f,
-            2.25f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 2.75f, -1.5f, 1f, -1.5f, 1f, 1f, 1f, 1f, 0f,
-            1.5f, 1f, 1.25f, 6.5f, 1.25f, 1f, 1f, 1.5f, -.5f, 1f, 1f, 1f, -.5f, 2f, 1f, 1f, 0f,
-        };
+        private byte[] _redValues = new byte[144];
+        private byte[] _greenValues = new byte[144];
+        private byte[] _blueValues = new byte[144];
 
-        private byte[,] ledMatrix = new byte[7, 92];
+        private byte[][] _dataPacket = new byte[5][]; // 2nd dimension initialized to size 64
 
-        private byte[] redValues = new byte[144];
-        private byte[] greenValues = new byte[144];
-        private byte[] blueValues = new byte[144];
-
-        private byte[][] dataPacket = new byte[5][]; // 2nd dimension initialized to size 64
-
-        byte red, grn, blu;
-
-        private Random rand;
+        private Random _random;
 
         public KeyboardWriter()
         {
             InitKeyboard();
 
-            rand = new Random();
+            _random = new Random();
 
-            for (int i = 0; i < dataPacket.Length; i++)
+            for (int i = 0; i < _dataPacket.Length; i++)
             {
-                this.dataPacket[i] = new byte[64];
+                _dataPacket[i] = new byte[64];
             }
-        }
-
-        public void Write()
-        {
-            var colors = new int[7][];
-            colors[0] = new int[] { 255, 0, 0 };
-            colors[1] = new int[] { 0, 255, 0 };
-            colors[2] = new int[] { 0, 0, 255 };
-            colors[3] = new int[] { 255, 255, 0 };
-            colors[4] = new int[] { 0, 255, 255 };
-            colors[5] = new int[] { 255, 0, 255 };
-            colors[6] = new int[] { 255, 255, 255 };
-
-            for (int i = 0; i < 91; i++)
-                for (int j = 0; j < 7; j++)
-                {
-                    var index = rand.Next(7);
-                    SetLed(i, j, colors[index][0], colors[index][1], colors[index][2]);
-                }
-
-            UpdateKeyboard();
         }
 
         public void Clear()
@@ -238,39 +194,9 @@ namespace KeybaordAudio
             UpdateKeyboard();
         }
 
-        public void Write(int iter, byte[] fftData)
-        {
-            // Rainbow to key lights
-            for (int x = 0; x < 91; x++)
-            {
-                for (int y = 0; y < 7; y++)
-                {
-                    this.red = (byte)(1.5f * (Math.Sin((x / 92.0f) * 2 * 3.14f) + 1));
-                    this.grn = (byte)(1.5f * (Math.Sin(((x / 92.0f) * 2 * 3.14f) - (6.28f / 3)) + 1));
-                    this.blu = (byte)(1.5f * (Math.Sin(((x / 92.0f) * 2 * 3.14f) + (6.28f / 3)) + 1));
-
-                    this.SetLed((x + iter) % 92, y, red, grn, blu);
-                }
-            }
-
-            //// FFT Data to key lights
-            //for (int i = 0; i < 91; i++)
-            //{
-            //    for (int k = 0; k < 7; k++)
-            //    {
-            //        if (fftData[(int)(i * 2.1 + 1)] > (255 / (15 + (i * 0.8))) * (7 - k))
-            //        {
-            //            this.SetLed(i, k, 0x07, 0x07, 0x07);
-            //        }
-            //    }
-            //}
-
-            UpdateKeyboard();
-        }
-
         private void SetLed(int x, int y, int r, int g, int b)
         {
-            int led = this.ledMatrix[y, x];
+            int led = _ledMatrix[y, x];
 
             if (led >= 144)
             {
@@ -285,9 +211,9 @@ namespace KeybaordAudio
             g = 7 - g;
             b = 7 - b;
 
-            this.redValues[led] = (byte)r;
-            this.greenValues[led] = (byte)g;
-            this.blueValues[led] = (byte)b;
+            _redValues[led] = (byte)r;
+            _greenValues[led] = (byte)g;
+            _blueValues[led] = (byte)b;
         }
 
         public void SetLed(int pos, int r, int g, int b)
@@ -302,76 +228,37 @@ namespace KeybaordAudio
             g = 7 - g;
             b = 7 - b;
 
-            this.redValues[pos] = (byte)r;
-            this.greenValues[pos] = (byte)g;
-            this.blueValues[pos] = (byte)b;
+            _redValues[pos] = (byte)r;
+            _greenValues[pos] = (byte)g;
+            _blueValues[pos] = (byte)b;
         }
 
         private int InitKeyboard()
         {
-            Console.WriteLine("Searching for Corsair K70 RGB keyboard...");
+            var keyboards = new Dictionary<string, uint[]>{
+                {"K95 RGB", new uint[]{0x1B1C, 0x1B11, 0x3}},
+                {"K70 RGB", new uint[]{0x1B1C, 0x1B13, 0x3}},
+            };
 
-            this.keyboardUsbDevice = this.GetDeviceHandle(0x1B1C, 0x1B13, 0x3);
-
-            if (this.keyboardUsbDevice == IntPtr.Zero)
+            var names = keyboards.Keys.ToArray();
+            Console.WriteLine("Searching for Corsair {0} keyboard...", names[0]);
+            for (var i = 0; i < names.Length; i++)
             {
-                Console.WriteLine("Corsair K70 RGB keyboard not detected...but it is ok, maybe you have a K95?");
-
-                this.keyboardUsbDevice = this.GetDeviceHandle(0x1B1C, 0x1B11, 0x3);
-                if (this.keyboardUsbDevice == IntPtr.Zero)
+                var name = names[i];
+                _keyboardUsbDevice = GetDeviceHandle(keyboards[name][0], keyboards[name][1], keyboards[name][2]);
+                if (_keyboardUsbDevice != IntPtr.Zero)
                 {
-                    Console.WriteLine("Nope, no K95 either...sorry you live that way.");
-                    return 1;
+                    Console.WriteLine("Corsair {0} detected successfully :)", name);
+                    return 0;
+                }
+                if (i + 1 < names.Length)
+                {
+                    Console.WriteLine("Couldn't find Corsair {0}... looking for {1} instead", name, names[i + 1]);
                 }
             }
+            Console.WriteLine("Couldn't find any compatible keyboard, it seems you're out of luck, sorry :(");
 
-            Console.WriteLine("Corsair K70 or K95 RGB keyboard detected successfully :)");
-
-            // Construct XY lookup table
-            var keys = this.positionMap.GetEnumerator();
-            keys.MoveNext();
-            var sizes = this.sizeMap.GetEnumerator();
-            sizes.MoveNext();
-
-            for (int y = 0; y < 7; y++)
-            {
-                byte key = 0x00;
-                int size = 0;
-
-                for (int x = 0; x < 92; x++)
-                {
-                    if (size == 0)
-                    {
-                        float sizef = (float)sizes.Current;
-                        sizes.MoveNext();
-                        if (sizef < 0)
-                        {
-                            size = (int)(-sizef * 4);
-                            key = 255;
-                        }
-                        else
-                        {
-                            key = (byte)keys.Current;
-                            keys.MoveNext();
-                            size = (int)(sizef * 4);
-                        }
-                    }
-
-                    ledMatrix[y, x] = key;
-                    size--;
-                }
-
-                if ((byte)keys.Current != 255 || (float)sizes.Current != 0f)
-                {
-                    Console.WriteLine("Bad line {0}", y);
-                    return 1;
-                }
-
-                keys.MoveNext();
-                sizes.MoveNext();
-            }
-
-            return 0;
+            return 1;
         }
 
         /// <summary>
@@ -473,65 +360,65 @@ namespace KeybaordAudio
             // Index:         0x03
             // Size:          64
 
-            this.dataPacket[0][0] = 0x7F;
-            this.dataPacket[0][1] = 0x01;
-            this.dataPacket[0][2] = 0x3C;
+            _dataPacket[0][0] = 0x7F;
+            _dataPacket[0][1] = 0x01;
+            _dataPacket[0][2] = 0x3C;
 
-            this.dataPacket[1][0] = 0x7F;
-            this.dataPacket[1][1] = 0x02;
-            this.dataPacket[1][2] = 0x3C;
+            _dataPacket[1][0] = 0x7F;
+            _dataPacket[1][1] = 0x02;
+            _dataPacket[1][2] = 0x3C;
 
-            this.dataPacket[2][0] = 0x7F;
-            this.dataPacket[2][1] = 0x03;
-            this.dataPacket[2][2] = 0x3C;
+            _dataPacket[2][0] = 0x7F;
+            _dataPacket[2][1] = 0x03;
+            _dataPacket[2][2] = 0x3C;
             
-            this.dataPacket[3][0] = 0x7F;
-            this.dataPacket[3][1] = 0x04;
-            this.dataPacket[3][2] = 0x24;
+            _dataPacket[3][0] = 0x7F;
+            _dataPacket[3][1] = 0x04;
+            _dataPacket[3][2] = 0x24;
             
-            this.dataPacket[4][0] = 0x07;
-            this.dataPacket[4][1] = 0x27;
-            this.dataPacket[4][4] = 0xD8;
+            _dataPacket[4][0] = 0x07;
+            _dataPacket[4][1] = 0x27;
+            _dataPacket[4][4] = 0xD8;
 
             for (int i = 0; i < 60; i++)
             {
-                this.dataPacket[0][i + 4] = (byte)(this.redValues[i * 2 + 1] << 4 | this.redValues[i * 2]);
+                _dataPacket[0][i + 4] = (byte)(_redValues[i * 2 + 1] << 4 | _redValues[i * 2]);
             }
 
             for (int i = 0; i < 12; i++)
             {
-                this.dataPacket[1][i + 4] = (byte)(this.redValues[i * 2 + 121] << 4 | this.redValues[i * 2 + 120]);
+                _dataPacket[1][i + 4] = (byte)(_redValues[i * 2 + 121] << 4 | _redValues[i * 2 + 120]);
             }
 
             for (int i = 0; i < 48; i++)
             {
-                this.dataPacket[1][i + 16] = (byte)(this.greenValues[i * 2 + 1] << 4 | this.greenValues[i * 2]);
+                _dataPacket[1][i + 16] = (byte)(_greenValues[i * 2 + 1] << 4 | _greenValues[i * 2]);
             }
 
             for (int i = 0; i < 24; i++)
             {
-                this.dataPacket[2][i + 4] = (byte)(this.greenValues[i * 2 + 97] << 4 | this.greenValues[i * 2 + 96]);
+                _dataPacket[2][i + 4] = (byte)(_greenValues[i * 2 + 97] << 4 | _greenValues[i * 2 + 96]);
             }
 
             for (int i = 0; i < 36; i++)
             {
-                this.dataPacket[2][i + 28] = (byte)(this.blueValues[i * 2 + 1] << 4 | this.blueValues[i * 2]);
+                _dataPacket[2][i + 28] = (byte)(_blueValues[i * 2 + 1] << 4 | _blueValues[i * 2]);
             }
 
             for (int i = 0; i < 36; i++)
             {
-                this.dataPacket[3][i + 4] = (byte)(this.blueValues[i * 2 + 73] << 4 | this.blueValues[i * 2 + 72]);
+                _dataPacket[3][i + 4] = (byte)(_blueValues[i * 2 + 73] << 4 | _blueValues[i * 2 + 72]);
             }
 
-            this.SendUsbMessage(dataPacket[0]);
+            SendUsbMessage(_dataPacket[0]);
             System.Threading.Thread.Sleep(10);
-            this.SendUsbMessage(dataPacket[1]);
+            SendUsbMessage(_dataPacket[1]);
             System.Threading.Thread.Sleep(10);
-            this.SendUsbMessage(dataPacket[2]);
+            SendUsbMessage(_dataPacket[2]);
             System.Threading.Thread.Sleep(10);
-            this.SendUsbMessage(dataPacket[3]);
+            SendUsbMessage(_dataPacket[3]);
             System.Threading.Thread.Sleep(10);
-            this.SendUsbMessage(dataPacket[4]);
+            SendUsbMessage(_dataPacket[4]);
             System.Threading.Thread.Sleep(10);
         }
 
@@ -543,7 +430,7 @@ namespace KeybaordAudio
                 usb_pkt[i] = data_pkt[i - 1];
             }
 
-            HidD_SetFeature(this.keyboardUsbDevice, ref usb_pkt[0], 65);
+            HidD_SetFeature(_keyboardUsbDevice, ref usb_pkt[0], 65);
         }
     }
 }
