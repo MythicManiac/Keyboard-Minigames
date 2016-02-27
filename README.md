@@ -18,12 +18,13 @@ Basically it turns your keyboard into a snake game, see example here: https://ww
 How to use
 ----------
 
-1. Exctract the zip somewhere
-2. Open your Corsair Utility Engine
-3. Select "Assign New Action" on the button you wish to use to launch the snake game
-4. Choose "Shortcut"
-5. Choose "Run the following program"
-6. Navigate to the directory you extracted the zip, and select the "SnakeGame" file
+1. Download the latest version from the **RELEASES** section (not the "Download ZIP" button)
+2. Exctract the zip somewhere
+3. Open your Corsair Utility Engine
+4. Select "Assign New Action" on the button you wish to use to launch the snake game
+5. Choose "Shortcut"
+6. Choose "Run the following program"
+7. Navigate to the directory you extracted the zip, and select the "SnakeGame" file
 
 Now you can start the snake game by pressing your macro key.
 
