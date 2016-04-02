@@ -8,7 +8,7 @@ This project has been tested with the following keyboards:
 
 Other Corsair keyboards technically should work as well, however, I have not been able to test them
 
-What is it
+What is it?
 ----------
 
 This is a simple snake game written in C# with Corsair's CUE SDK's help
